@@ -55,10 +55,10 @@ def create_report(dday, pdf, folder):
     image_path = r'' + folder + r'\plot.jpg'
     print(image_path)
     save_plot(x, tensione, corrente, temperatura, image_path)
-    pdf.image(r'' + image_path, 0, 140, width - 10)
+    pdf.image(r'' + image_path, 0, 155, width - 10)
     # Customer data
     customer_path = os.path.join(main_path, 'Dati_cliente.csv')
-    customer_data = read_customer_data(customer_path)
+    customer_data, note = read_customer_data(customer_path)
     string = table_to_string(customer_data)
     pdf.set_font('Arial', 'B', 16)
     # Move to 8 cm to the right
@@ -66,6 +66,9 @@ def create_report(dday, pdf, folder):
     # Centered text in a framed 20*10 mm cell and line break
     pdf.cell(20, 10, string, 0, 1, 'C')
     pdf.line(10, 50, 200, 50)
+
+    pdf.set_font('Arial', '', 11)
+    pdf.text(15, 55, 'Note: ' + note)
 
     step_path = os.path.join(main_path, 'ricetta.csv')
     step_df = step_data_reader(step_path)
@@ -76,6 +79,7 @@ def create_report(dday, pdf, folder):
     cols = [['step'] + table.columns.tolist()]
     data = table.reset_index().values.tolist()
     ftable = cols + data
+    pdf.ln(20)
     pdf.create_table(table_data=ftable, cell_width=20, align_data='C', align_header='C',
                      x_start=5)
 

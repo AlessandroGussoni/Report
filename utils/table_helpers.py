@@ -12,8 +12,11 @@ def cast_seconds(v):
 
 def read_plot_table(path):
     df = pd.read_csv(path, index_col=False, error_bad_lines=False)
+    column_name = df.columns[0]
     columns = ['VarName', 'TimeString', 'VarValue', 'Validity', 'Time_ms']
-    df = df[columns]
+    df = df[column_name].str.split(';', expand=True)
+    df.columns = columns
+    df = df.iloc[:-1, :]
     df['time'] = df.TimeString.str.split(' ', expand=True).iloc[:, 1].apply(lambda x: x.replace('"', ''))
     df.time = df.time.apply(lambda x: cast_seconds(x))
     idx = []
@@ -31,7 +34,7 @@ def read_customer_data(path):
     df = pd.read_csv(path, sep=';')
     df.columns = [col.strip() for col in df.columns]
     columns = ['Client', 'Order', 'N_serial', 'Dim1', 'Dim2']
-    return df[columns].replace(np.nan, 0)
+    return df[columns].replace(np.nan, 0), df.Note.values[0]
 
 
 def save_table_image(df, path):
@@ -79,4 +82,26 @@ def aggregate_step_data(data, keys, order):
         step.index = [key]
 
         table = pd.concat([table, step], axis=0)
+
+    table.amp = table.amp.astype('float')
+    table.temp_lav = table.temp_lav.astype('float')
+
+    table.amp = table.amp / 10
+
+    table.temp_lav = table.temp_lav / 10
+
+    table.amp = table.amp.astype('str')
+    table.temp_lav = table.temp_lav.astype('str')
+    print(table.temp_lav.values)
+    print(table.amp.values)
+
+    table.mod_crom = table.mod_crom.apply(lambda x: 'crome' if x == 0 else 'etching')
+    matches = {'0': 'Start from previous',
+               '1': 'Start from max',
+               '2': 'Start from min'}
+
+    table.replace({'start_da': matches}, inplace=True)
+
+    table.volt = table.volt.astype('float') / 10
+    table.volt = table.volt.astype('str')
     return table

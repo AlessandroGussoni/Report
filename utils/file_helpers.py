@@ -15,4 +15,4 @@ def create_temporary_cache(path):
     results_path = Path(dir_path)
     if not results_path.exists():
         results_path.mkdir()
-    return path
+    return dir_path

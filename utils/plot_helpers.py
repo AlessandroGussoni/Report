@@ -31,8 +31,8 @@ def save_plot(x, tensione, corrente, temperatura, data_path):
     p2, = twin1.plot(x, corrente, "r-", label="corrente", linewidth=1)
     p3, = twin2.plot(x, temperatura, "g-", label="temperatura", linewidth=1)
 
-    ax.set_ylim(0, 10000)
-    twin1.set_ylim(0, 100)
+    ax.set_ylim(-3.0, 15.0)
+    twin1.set_ylim(0, 30)
     twin2.set_ylim(0, 100)
 
     ax.set_xlabel("Time")
